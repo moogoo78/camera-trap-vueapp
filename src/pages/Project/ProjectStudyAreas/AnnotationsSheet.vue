@@ -598,7 +598,7 @@ export default {
         },
         {
           data: 'time',
-          readOnly: true,
+          //          readOnly: true,
           renderer: (instance, td, row, col, prop, value) => {
             resetTd(td);
 
@@ -625,8 +625,9 @@ export default {
                 className.push('period-x');
               }
             }
-
-            td.innerHTML = dateFormatYYYYMMDDHHmmss(value);
+            td.innerHTML = moment(value)
+              .utcOffset(0)
+              .format('YYYY-MM-DD HH:mm:ss'); //dateFormatYYYYMMDDHHmmss(value);
             td.className = className.join(' ');
             return td;
           },
