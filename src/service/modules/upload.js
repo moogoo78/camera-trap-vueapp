@@ -61,22 +61,30 @@ const uploadCoverImage = async file => {
   return data;
 };
 
-const uploadFileByCameraLocation = async (cameraLocationId, file, signal) => {
+const uploadFileByCameraLocation = async (
+  cameraLocationId,
+  file,
+  signal,
+  workingRange,
+) => {
   const formData = new FormData();
   formData.append('file', file);
 
   const query = queryString.stringify({
     cameraLocation: cameraLocationId,
+    workingRange: workingRange,
     ...getAnnotationQuery(file),
   });
 
   const url = `/api/v1/files?${query}`;
+  console.log(url);
+  /*
   const data = await fetchUpload({
     url,
     body: formData,
     signal,
   });
-  return data;
+  return data;*/
 };
 
 const uploadFileByAnnotation = async (annotationId, file, signal) => {

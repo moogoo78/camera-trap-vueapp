@@ -191,6 +191,8 @@ import { uploadFileByCameraLocation } from '@/service';
 import InfoModal from '@/components/Modal/InfoModal.vue';
 import uploadStatus from '@/constant/uploadStatus.js';
 const studyAreas = createNamespacedHelpers('studyAreas');
+import { dateFormatYYYYMMDDHHmmss } from '@/utils/dateHelper.js';
+import moment from 'moment';
 
 /* TODO(moogoo) 需確認錯誤訊息 (API 回傳跟前端顯示文字的對應)
 
@@ -208,6 +210,14 @@ const studyAreas = createNamespacedHelpers('studyAreas');
   cjk: to merge and use /src/service/modules/upload.js
 
 */
+const getTime = (day, time, second = 0, millisecond = 0) => {
+  return moment(day)
+    .hour(time.HH)
+    .minute(time.mm)
+    .second(second)
+    .millisecond(millisecond);
+};
+
 export default {
   components: {
     InfoModal,
@@ -216,6 +226,9 @@ export default {
     fileList: {
       type: Array,
       required: true,
+    },
+    workingRange: {
+      type: Object,
     },
   },
   data() {
@@ -247,11 +260,31 @@ export default {
           this.setFileType(index, uploadStatus.uploading);
           try {
             this.currentFetchController = new AbortController();
-            await uploadFileByCameraLocation(
-              file.cameraLocationId,
-              file,
-              this.currentFetchController.signal,
-            );
+            if (this.workingRange.toggle) {
+              const startTime = getTime(
+                this.workingRange.startDate,
+                this.workingRange.startTime,
+              );
+              const endTime = getTime(
+                this.workingRange.endDate,
+                this.workingRange.endTime,
+              );
+              const workingRange = `${dateFormatYYYYMMDDHHmmss(
+                startTime,
+              )},${dateFormatYYYYMMDDHHmmss(endTime)}`;
+              await uploadFileByCameraLocation(
+                file.cameraLocationId,
+                file,
+                this.currentFetchController.signal,
+                workingRange,
+              );
+            } else {
+              await uploadFileByCameraLocation(
+                file.cameraLocationId,
+                file,
+                this.currentFetchController.signal,
+              );
+            }
             this.setFileType(index, uploadStatus.success);
           } catch (error) {
             if (error instanceof DOMException) {

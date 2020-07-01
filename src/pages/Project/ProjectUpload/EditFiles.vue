@@ -135,6 +135,71 @@
               選擇並編輯上傳檔案 ({{ selectedFileList.length }} /
               {{ fileList.length }})
             </p>
+
+            <div class="form-group">
+              <div class="checkbox checkbox-inline mb-0 mt-2">
+                <input
+                  type="checkbox"
+                  name="toggel-working-range"
+                  id="toggel-working-range"
+                  :checked="tempWorkingRange.toggle"
+                  @change="toggleWorkingRange"
+                />
+                <label for="toggel-working-range">設定有效工作時間</label>
+              </div>
+            </div>
+            <div class="form-group" v-if="tempWorkingRange.toggle">
+              <label>有效開始工作時間</label>
+              <div class="input-group-inline">
+                <div class="input-group ml-2" style="width: 50px">
+                  <date-picker
+                    :format="'YYYY-MM-DD'"
+                    :first-day-of-week="1"
+                    v-model="tempWorkingRange.startDate"
+                    placeholder="請選擇日期"
+                    style="width: 200px"
+                    @change="setWorkingRange('startDate')"
+                  ></date-picker>
+                  <div class="input-group-append">
+                    <i class="icon icon-calendar"></i>
+                  </div>
+                </div>
+                <div class="input-group ml-2" style="width: 50px">
+                  <vue-timepicker
+                    v-model="tempWorkingRange.startTime"
+                    @change="setWorkingRange('startTime')"
+                    hide-clear-button
+                  ></vue-timepicker>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group" v-if="tempWorkingRange.toggle">
+              <label>有效結束工作時間</label>
+              <div class="input-group-inline">
+                <div class="input-group ml-2" style="width: 50px">
+                  <date-picker
+                    :format="'YYYY-MM-DD'"
+                    :first-day-of-week="1"
+                    v-model="tempWorkingRange.endDate"
+                    placeholder="請選擇日期"
+                    @change="setWorkingRange('endDate')"
+                    style="width: 200px"
+                  ></date-picker>
+                  <div class="input-group-append">
+                    <i class="icon icon-calendar"></i>
+                  </div>
+                </div>
+                <div class="input-group ml-2" style="width: 50px">
+                  <vue-timepicker
+                    v-model="tempWorkingRange.endTime"
+                    @change="setWorkingRange('endTime')"
+                    hide-clear-button
+                  ></vue-timepicker>
+                </div>
+              </div>
+            </div>
+
             <div class="form-group">
               <label class="required">樣區：</label>
               <v-select
@@ -202,7 +267,10 @@
 
 <script>
 import { createNamespacedHelpers } from 'vuex';
+import { getTodayDate } from '@/utils/dateHelper.js';
+import DatePicker from 'vue2-datepicker';
 import VueDropzone from 'vue2-dropzone';
+import VueTimepicker from 'vue2-timepicker';
 import filesize from 'filesize';
 import idx from 'idx';
 import vSelect from 'vue-select';
@@ -219,11 +287,16 @@ export default {
   components: {
     vSelect,
     VueDropzone,
+    VueTimepicker,
+    DatePicker,
   },
   props: {
     fileList: {
       type: Array,
       required: true,
+    },
+    workingRange: {
+      type: Object,
     },
   },
   data() {
@@ -232,6 +305,19 @@ export default {
       selectedFileList: [], // 對應 fileList 的 _.upload.uuid
       currentSite: undefined,
       doFetch: false, // 紀錄是否有請求取得相機位置用來判斷是沒有相機位置還是還沒送請求
+      tempWorkingRange: {
+        toggle: false,
+        startDate: getTodayDate(),
+        endDate: getTodayDate(),
+        startTime: {
+          HH: '00',
+          mm: '00',
+        },
+        endTime: {
+          HH: '23',
+          mm: '59',
+        },
+      },
     };
   },
   watch: {
@@ -283,6 +369,10 @@ export default {
       this.selectedFileList = e.target.checked
         ? this.fileList.map(v => v.upload.uuid)
         : [];
+    },
+    toggleWorkingRange(e) {
+      this.tempWorkingRange.toggle = e.target.checked;
+      this.$emit('workingRange', 'toggle', this.tempWorkingRange.toggle);
     },
     removeFiles() {
       // 刪除所有選取的檔案
@@ -377,6 +467,9 @@ export default {
     },
     addFiles(files) {
       this.$emit('change', R.concat(this.fileList, [...files]));
+    },
+    setWorkingRange(cat) {
+      this.$emit('workingRange', cat, this.tempWorkingRange[cat]);
     },
   },
 };

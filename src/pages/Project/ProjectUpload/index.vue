@@ -29,11 +29,13 @@
         :fileList="fileList"
         @change="fileList = $event"
         @doUpload="isUploading = true"
+        @workingRange="updateWorkingRange"
       />
       <upload-process
         v-else-if="isUploading === true"
         :fileList="fileList"
         @change="fileList = $event"
+        :workingRange="workingRange"
       />
     </div>
     <!-- 上傳說明 -->
@@ -52,6 +54,7 @@ import UploadProcess from './UploadProcess.vue';
 
 const projects = createNamespacedHelpers('projects');
 const studyAreas = createNamespacedHelpers('studyAreas');
+import { getTodayDate } from '@/utils/dateHelper.js';
 
 export default {
   components: {
@@ -68,6 +71,18 @@ export default {
       trialModalOpen: false,
       fileList: [],
       isUploading: false,
+      workingRange: {
+        startDate: getTodayDate(),
+        endDate: getTodayDate(),
+        startTime: {
+          HH: '00',
+          mm: '00',
+        },
+        endTime: {
+          HH: '23',
+          mm: '59',
+        },
+      },
     };
   },
   computed: {
@@ -89,6 +104,10 @@ export default {
   },
   methods: {
     ...studyAreas.mapActions(['getProjectStudyAreas']),
+    updateWorkingRange(cat, value) {
+      this.workingRange[cat] = value;
+      console.log(this.workingRange, 'inde', value);
+    },
   },
 };
 </script>

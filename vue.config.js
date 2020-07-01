@@ -28,7 +28,7 @@ module.exports = {
       if (['production', 'staging'].indexOf(process.env.VUE_APP_MODE) >= 0) {
         result.push(
           new CompressionWebpackPlugin({
-            filename: '[path]',
+            filename: '[path].gz',
             algorithm: 'gzip',
             test: /\.js$/,
             threshold: 0,
