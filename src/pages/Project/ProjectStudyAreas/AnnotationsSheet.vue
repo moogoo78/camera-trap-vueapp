@@ -625,9 +625,7 @@ export default {
                 className.push('period-x');
               }
             }
-            td.innerHTML = moment(value)
-              .utcOffset(0)
-              .format('YYYY-MM-DD HH:mm:ss'); //dateFormatYYYYMMDDHHmmss(value);
+            td.innerHTML = dateFormatYYYYMMDDHHmmss(value);
             td.className = className.join(' ');
             return td;
           },
