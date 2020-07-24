@@ -227,6 +227,11 @@ const mutations = {
 const actions = {
   async getProjects({ commit }, payload) {
     const data = await getProjects(payload);
+    // timestame + 8
+    for (let i in data.items) {
+      data.items[i].startTime = dateFormatYYYY(data.items[i].startTime);
+      data.items[i].endTime = dateFormatYYYY(data.items[i].endTime);
+    }
     commit(
       payload.index === 0 ? 'setProjects' : 'appendProjects',
       idx(data, _ => _.items) || [],
