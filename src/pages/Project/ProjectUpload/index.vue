@@ -106,7 +106,6 @@ export default {
     ...studyAreas.mapActions(['getProjectStudyAreas']),
     updateWorkingRange(cat, value) {
       this.workingRange[cat] = value;
-      console.log(this.workingRange, 'inde', value);
     },
   },
 };
